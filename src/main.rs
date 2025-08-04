@@ -1,16 +1,18 @@
 use minifb::{Window, WindowOptions};
+use std::time::{Duration, Instant};
 
 fn main() {
     println!("Hello, world!");
 
-    let width = 1280;
-    let height = 720;
+    let width = 640;
+    let height = 480;
     let mut pin: usize = 0;
     let wh = width * height;
     let qheight = (height / 4);
-    let mut x = 0;
-    let mut xx = width;
+    let mut x = 0.0;
+    let mut xx = width as f64;
     let round_size = 50;
+    let speed = 160.0;
 
     let mut buffer: Vec<u32> = vec![0; width * height];
     let mut window = Window::new(
@@ -22,8 +24,18 @@ fn main() {
     .unwrap();
 
     // window.set_target_fps(60);
+    let mut last_time = Instant::now();
+    let target_frame_time = Duration::from_secs_f64(1.0 / 60.0);
 
     while window.is_open() && !window.is_key_down(minifb::Key::Escape) {
+        // Calculate time since last frame
+        let now = Instant::now();
+        let delta = now - last_time;
+        last_time = now;
+
+        let seconds = delta.as_secs_f64() * speed;
+
+        // draw bg
         for i in buffer.iter_mut() {
             if pin < (wh / 4) * 1 {
                 *i = 0xff0000;
@@ -40,12 +52,26 @@ fn main() {
             if pin >= width * height {
                 pin = 0;
             }
+        } // end for
+        // end draw bg
+
+        // moving moving
+        if !window.is_key_down(minifb::Key::Space) {
+            x = (x + seconds) % width as f64;
+
+            if xx > 0.0 {
+                xx -= seconds;
+            } else {
+                xx = width as f64 - seconds;
+            }
         }
+
+        // draw box
 
         draw_rect(
             &mut buffer,
             width,
-            x,
+            x as usize,
             (qheight * 1) - (qheight - ((qheight - round_size) / 2)),
             round_size,
             round_size,
@@ -54,7 +80,7 @@ fn main() {
         draw_rect_flipped_x(
             &mut buffer,
             width,
-            xx,
+            xx as usize,
             (qheight * 2) - (qheight - ((qheight - round_size) / 2)),
             round_size,
             round_size,
@@ -63,7 +89,7 @@ fn main() {
         draw_rect(
             &mut buffer,
             width,
-            x,
+            x as usize,
             (qheight * 3) - (qheight - ((qheight - round_size) / 2)),
             round_size,
             round_size,
@@ -72,24 +98,20 @@ fn main() {
         draw_rect_flipped_x(
             &mut buffer,
             width,
-            xx,
+            xx as usize,
             (qheight * 4) - (qheight - ((qheight - round_size) / 2)),
             round_size,
             round_size,
             0x000000,
         );
 
-        if !window.is_key_down(minifb::Key::Space) {
-            x = (x + 1) % width;
-
-            if xx > 0 {
-                xx -= 1;
-            } else {
-                xx = width - 1;
-            }
-        }
-
+        // push frame
         window.update_with_buffer(&buffer, width, height).unwrap();
+
+        // Optional: sleep to cap frame rate
+        if delta < target_frame_time {
+            std::thread::sleep(target_frame_time - delta);
+        }
     }
 } // end func
 
