@@ -3,18 +3,25 @@ use minifb::{Window, WindowOptions};
 fn main() {
     println!("Hello, world!");
 
-    let width = 640;
-    let height = 480;
+    let width = 1280;
+    let height = 720;
     let mut pin: usize = 0;
     let wh = width * height;
+    let qheight = (height / 4);
     let mut x = 0;
     let mut xx = width;
+    let round_size = 50;
 
     let mut buffer: Vec<u32> = vec![0; width * height];
-    let mut window =
-        Window::new("Simpe Smooth Running Box", width, height, WindowOptions::default()).unwrap();
+    let mut window = Window::new(
+        "Simpe Smooth Running Box",
+        width,
+        height,
+        WindowOptions::default(),
+    )
+    .unwrap();
 
-    window.set_target_fps(165);
+    // window.set_target_fps(60);
 
     while window.is_open() && !window.is_key_down(minifb::Key::Escape) {
         for i in buffer.iter_mut() {
@@ -35,17 +42,51 @@ fn main() {
             }
         }
 
-        draw_rect(&mut buffer, width, x, 0, 50, 50, 0x000000);
-        draw_rect_flipped_x(&mut buffer, width, xx, 120, 50, 50, 0x000000);
-        draw_rect(&mut buffer, width, x, 240, 50, 50, 0x000000);
-        draw_rect_flipped_x(&mut buffer, width, xx, 360, 50, 50, 0x000000);
+        draw_rect(
+            &mut buffer,
+            width,
+            x,
+            (qheight * 1) - (qheight - ((qheight - round_size) / 2)),
+            round_size,
+            round_size,
+            0x000000,
+        );
+        draw_rect_flipped_x(
+            &mut buffer,
+            width,
+            xx,
+            (qheight * 2) - (qheight - ((qheight - round_size) / 2)),
+            round_size,
+            round_size,
+            0x000000,
+        );
+        draw_rect(
+            &mut buffer,
+            width,
+            x,
+            (qheight * 3) - (qheight - ((qheight - round_size) / 2)),
+            round_size,
+            round_size,
+            0x000000,
+        );
+        draw_rect_flipped_x(
+            &mut buffer,
+            width,
+            xx,
+            (qheight * 4) - (qheight - ((qheight - round_size) / 2)),
+            round_size,
+            round_size,
+            0x000000,
+        );
 
-        x = (x + 1) % width;
+        if !window.is_key_down(minifb::Key::Space) {
+            x = (x + 1) % width;
 
-        if xx > 0 {
-            xx -= 1;
-        } else {
-            xx = width;
+            if xx > 0 {
+                xx -= 1;
+            } else {
+                xx = width - 1;
+            }
         }
 
         window.update_with_buffer(&buffer, width, height).unwrap();
