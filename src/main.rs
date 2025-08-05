@@ -1,3 +1,4 @@
+use clearscreen::{ClearScreen, clear};
 use minifb::{Window, WindowOptions};
 use std::time::{Duration, Instant};
 
@@ -13,7 +14,9 @@ fn main() {
     let mut xx = width as f64;
     let round_size = 50;
     let speed = 160.0;
-
+    let mut fps_timer = 0.0;
+    let mut frame_count = 0;
+    let mut velocity = 1.0;
     let mut buffer: Vec<u32> = vec![0; width * height];
     let mut window = Window::new(
         "Simpe Smooth Running Box",
@@ -33,7 +36,7 @@ fn main() {
         let delta = now - last_time;
         last_time = now;
 
-        let seconds = delta.as_secs_f64() * speed;
+        let seconds = delta.as_secs_f64();
 
         // draw bg
         for i in buffer.iter_mut() {
@@ -54,17 +57,6 @@ fn main() {
             }
         } // end for
         // end draw bg
-
-        // moving moving
-        if !window.is_key_down(minifb::Key::Space) {
-            x = (x + seconds) % width as f64;
-
-            if xx > 0.0 {
-                xx -= seconds;
-            } else {
-                xx = width as f64 - seconds;
-            }
-        }
 
         // draw box
 
@@ -105,8 +97,45 @@ fn main() {
             0x000000,
         );
 
+        // moving moving
+        if !window.is_key_down(minifb::Key::Space) {
+            // normal move
+            // x = (x + seconds) % width as f64;
+
+            // anti thesis normal move
+            if xx > 0.0 {
+                xx -= velocity;
+            } else {
+                xx = width as f64 - velocity;
+            }
+
+            // pingpong move
+            if x >= (width - round_size) as f64 {
+                x -= 1.0;
+                velocity = -velocity;
+            } else if x <= 0.0 {
+                x += 1.0;
+                velocity = velocity * -1.0;
+            } else {
+                x += velocity;
+            }
+        }
+
         // push frame
         window.update_with_buffer(&buffer, width, height).unwrap();
+
+        frame_count += 1;
+        fps_timer += delta.as_secs_f64();
+
+        if fps_timer >= 1.0 {
+            clear().unwrap();
+            println!(
+                "FPS: {} \nX pos: {} \nVelocity: {}",
+                frame_count, x, velocity
+            );
+            frame_count = 0;
+            fps_timer = 0.0;
+        }
 
         // Optional: sleep to cap frame rate
         if delta < target_frame_time {
