@@ -24,7 +24,7 @@ fn main() {
     let mut frame_count = 0;
     let mut buffer: Vec<u32> = vec![0; width * height];
     let mut window = Window::new(
-        "Simpe Smooth Running Box",
+        "Simple Smooth moving Box",
         width,
         height,
         WindowOptions::default(),
@@ -36,53 +36,15 @@ fn main() {
     let target_frame_time = Duration::from_secs_f64(1.0 / 60.0);
 
     // define box
-    let mut box_1 = Rect {
-        x: width / 2 - (round_size / 2),
-        y: height / 2 - (round_size / 2),
-        w: round_size,
-        h: round_size,
-        width: width,
-        height: height,
-        velocity_x: 1,
-        velocity_y: 0,
-        color: 0x000000,
-    };
+    let mut box_1 = create_box(0x000000, 1, 0, Some(width), Some(height), Some(round_size));
+    let mut box_2 = create_box(0x000000, -1, 0, Some(width), Some(height), Some(round_size));
+    let mut box_3 = create_box(0x000000, 0, 1, Some(width), Some(height), Some(round_size));
+    let mut box_4 = create_box(0x000000, 0, -1, Some(width), Some(height), Some(round_size));
 
-    let mut box_2 = Rect {
-        x: width / 2 - (round_size / 2),
-        y: height / 2 - (round_size / 2),
-        w: round_size,
-        h: round_size,
-        width: width,
-        height: height,
-        velocity_x: -1,
-        velocity_y: 0,
-        color: 0x000000,
-    };
-
-    let mut box_3 = Rect {
-        x: width / 2 - (round_size / 2),
-        y: height / 2 - (round_size / 2),
-        w: round_size,
-        h: round_size,
-        width: width,
-        height: height,
-        velocity_x: 0,
-        velocity_y: 1,
-        color: 0x000000,
-    };
-
-    let mut box_4 = Rect {
-        x: width / 2 - (round_size / 2),
-        y: height / 2 - (round_size / 2),
-        w: round_size,
-        h: round_size,
-        width: width,
-        height: height,
-        velocity_x: 0,
-        velocity_y: -1,
-        color: 0x000000,
-    };
+    let mut box_5 = create_box(0x000000, -1, -1, Some(width), Some(height), Some(round_size));
+    let mut box_6 = create_box(0x000000, 1, -1, Some(width), Some(height), Some(round_size));
+    let mut box_7 = create_box(0x000000, -1, 1, Some(width), Some(height), Some(round_size));
+    let mut box_8 = create_box(0x000000, 1, 1, Some(width), Some(height), Some(round_size));
     // end define box
 
     while window.is_open() && !window.is_key_down(minifb::Key::Escape) {
@@ -111,17 +73,16 @@ fn main() {
         } // end for
         // end draw bg
 
-        // draw box 1
+        // draw boxx
         box_1.draw_rect(&mut buffer, &width);
-
-        // draw box 2
         box_2.draw_rect(&mut buffer, &width);
-
-        // draw box 3
         box_3.draw_rect(&mut buffer, &width);
-
-        // draw box 4
         box_4.draw_rect(&mut buffer, &width);
+
+        box_5.draw_rect(&mut buffer, &width);
+        box_6.draw_rect(&mut buffer, &width);
+        box_7.draw_rect(&mut buffer, &width);
+        box_8.draw_rect(&mut buffer, &width);
 
         // moving moving
         if !window.is_key_down(minifb::Key::Space) {
@@ -129,6 +90,11 @@ fn main() {
             box_2.move_rect();
             box_3.move_rect();
             box_4.move_rect();
+
+            box_5.move_rect();
+            box_6.move_rect();
+            box_7.move_rect();
+            box_8.move_rect();
         }
 
         // push frame
@@ -155,4 +121,29 @@ fn main() {
             std::thread::sleep(target_frame_time - delta);
         }
     }
+} // end func
+
+fn create_box(
+    color: u32,
+    velocity_x: isize,
+    velocity_y: isize,
+    width: Option<usize>,
+    height: Option<usize>,
+    round_size: Option<usize>,
+) -> Rect {
+    let width = width.unwrap_or(640);
+    let height = height.unwrap_or(640);
+    let round_size = round_size.unwrap_or(50);
+
+    return Rect {
+        x: width / 2 - (round_size / 2),
+        y: height / 2 - (round_size / 2),
+        w: round_size,
+        h: round_size,
+        width: width,
+        height: height,
+        velocity_x: velocity_x,
+        velocity_y: velocity_y,
+        color: color,
+    };
 } // end func

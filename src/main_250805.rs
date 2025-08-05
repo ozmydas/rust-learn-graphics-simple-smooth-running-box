@@ -19,7 +19,7 @@ fn main() {
     let mut velocity = 1.0;
     let mut buffer: Vec<u32> = vec![0; width * height];
     let mut window = Window::new(
-        "Simpe Smooth Running Box",
+        "Simpe Smooth moving Box",
         width,
         height,
         WindowOptions::default(),
