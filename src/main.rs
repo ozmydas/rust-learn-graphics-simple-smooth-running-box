@@ -1,6 +1,9 @@
 use crossterm::{execute, terminal};
 use minifb::{Window, WindowOptions};
-use std::{io::stdout, time::{Duration, Instant}};
+use std::{
+    io::stdout,
+    time::{Duration, Instant},
+};
 
 use crate::utils::my_rect::Rect;
 
@@ -10,10 +13,10 @@ fn main() {
     println!("Hello, world!");
 
     let width = 640;
-    let height = 480;
+    let height = 640;
     let mut byte_index: usize = 0;
     let wh = width * height;
-    let qheight = (height / 4);
+    // let qheight = (height / 4);
     let x = 0.0;
     let round_size = 50;
     let velocity = 1.0;
@@ -34,38 +37,50 @@ fn main() {
 
     // define box
     let mut box_1 = Rect {
-        x: x as usize,
-        y: (qheight * 1) - (qheight - ((qheight - round_size) / 2)),
+        x: width / 2 - (round_size / 2),
+        y: height / 2 - (round_size / 2),
         w: round_size,
         h: round_size,
-        velocity: velocity,
+        width: width,
+        height: height,
+        velocity_x: 1,
+        velocity_y: 0,
         color: 0x000000,
     };
 
     let mut box_2 = Rect {
-        x: width - round_size as usize,
-        y: (qheight * 2) - (qheight - ((qheight - round_size) / 2)),
+        x: width / 2 - (round_size / 2),
+        y: height / 2 - (round_size / 2),
         w: round_size,
         h: round_size,
-        velocity: velocity * -1.0,
+        width: width,
+        height: height,
+        velocity_x: -1,
+        velocity_y: 0,
         color: 0x000000,
     };
 
     let mut box_3 = Rect {
-        x: x as usize,
-        y: (qheight * 3) - (qheight - ((qheight - round_size) / 2)),
+        x: width / 2 - (round_size / 2),
+        y: height / 2 - (round_size / 2),
         w: round_size,
         h: round_size,
-        velocity: velocity,
+        width: width,
+        height: height,
+        velocity_x: 0,
+        velocity_y: 1,
         color: 0x000000,
     };
 
     let mut box_4 = Rect {
-        x: width - round_size as usize,
-        y: (qheight * 4) - (qheight - ((qheight - round_size) / 2)),
+        x: width / 2 - (round_size / 2),
+        y: height / 2 - (round_size / 2),
         w: round_size,
         h: round_size,
-        velocity: velocity* -1.0,
+        width: width,
+        height: height,
+        velocity_x: 0,
+        velocity_y: -1,
         color: 0x000000,
     };
     // end define box
@@ -98,22 +113,22 @@ fn main() {
 
         // draw box 1
         box_1.draw_rect(&mut buffer, &width);
-        
+
         // draw box 2
         box_2.draw_rect(&mut buffer, &width);
 
         // draw box 3
         box_3.draw_rect(&mut buffer, &width);
-        
+
         // draw box 4
         box_4.draw_rect(&mut buffer, &width);
 
         // moving moving
         if !window.is_key_down(minifb::Key::Space) {
-            box_1.move_rect(&width, &round_size);
-            box_2.move_rect(&width, &round_size);
-            box_3.move_rect(&width, &round_size);
-            box_4.move_rect(&width, &round_size);
+            box_1.move_rect();
+            box_2.move_rect();
+            box_3.move_rect();
+            box_4.move_rect();
         }
 
         // push frame
@@ -125,7 +140,7 @@ fn main() {
 
         if fps_timer >= 1.0 {
             // clear cmd
-            execute!(stdout(),terminal::Clear(terminal::ClearType::All)).unwrap();
+            execute!(stdout(), terminal::Clear(terminal::ClearType::All)).unwrap();
 
             println!(
                 "FPS: {} \nX pos: {} \nVelocity: {} \nTest: {}",

@@ -5,7 +5,10 @@ pub struct Rect {
     pub y: usize,
     pub w: usize,
     pub h: usize,
-    pub velocity: f64,
+    pub width: usize,
+    pub height: usize,
+    pub velocity_x: isize,
+    pub velocity_y: isize,
     pub color: u32,
 }
 
@@ -26,16 +29,33 @@ impl Rect {
         }
     } // end func
 
-    pub fn move_rect(&mut self, width: &usize, round_size: &usize) {
-        if self.x >= (width - round_size) {
-            self.x = self.x - 1;
-            self.velocity = -self.velocity;
-        } else if self.x <= 0 {
-            self.x = self.x + 1;
-            self.velocity = self.velocity * -1.0;
-        } else {
-            let adder = self.x as f64 + self.velocity;
-            self.x = adder as usize;
+    pub fn move_rect(&mut self) {
+        // geser x
+        if self.velocity_x > 0 || self.velocity_x < 0 {
+            if self.x >= (self.width - self.w) {
+                self.x = self.x - 1;
+                self.velocity_x = -self.velocity_x;
+            } else if self.x <= 0 {
+                self.x = self.x + 1;
+                self.velocity_x = self.velocity_x * -1;
+            } else {
+                let adder = self.x as isize+ self.velocity_x;
+                self.x = adder as usize;
+            }
+        }
+
+        // geser y
+        if self.velocity_y > 0 || self.velocity_y < 0 {
+            if self.y >= (self.height - self.h) {
+                self.y = self.y - 1;
+                self.velocity_y = -self.velocity_y;
+            } else if self.y <= 0 {
+                self.y = self.y + 1;
+                self.velocity_y = self.velocity_y * -1;
+            } else {
+                let adder = self.y as isize + self.velocity_y;
+                self.y = adder as usize;
+            }
         }
     } // end func
 
